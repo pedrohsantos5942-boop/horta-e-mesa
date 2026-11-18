@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horta & Mesa | Mãos Solidárias</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E2E8F0;
+            color: #0F172A;
+        }
+        /* Foco visível de alto contraste (Acessibilidade RNF04) */
+        *:focus-visible {
+            outline: 3px solid #D97706 !important;
+            outline-offset: 2px !important;
+        }
+        /* Barra de rolagem discreta dentro da moldura mobile */
+        .mobile-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .mobile-scroll::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        .mobile-scroll::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center py-4 px-2 sm:px-4">
+
+    <!-- MOLDURA DO SMARTPHONE ANDROID DE ENTRADA (fluida em telas menores) -->
+    <main class="w-full max-w-[410px] bg-slate-900 rounded-[2.5rem] p-3 shadow-2xl border-4 border-slate-800 relative">
+        <!-- Alto-falante / Câmera frontal simulada -->
+        <div class="w-24 h-1.5 bg-slate-700 rounded-full mx-auto mb-2.5" aria-hidden="true"></div>
+
+        <!-- TELA DO APLICATIVO (Fundo #F8FAFC de alto contraste) -->
+        <div class="bg-[#F8FAFC] text-slate-900 rounded-[1.85rem] overflow-hidden flex flex-col h-[740px] border border-slate-300 relative">
+
+            <!-- Barra de Status Android simulada -->
+            <div class="bg-[#044735] text-emerald-100 text-[11px] font-medium px-5 py-1.5 flex justify-between items-center select-none">
+                <span>14:30 • Mutirão Comunitário</span>
+                <div class="flex items-center gap-2">
+                    <span>4G / Wi-Fi</span>
+                    <span>🔋 88%</span>
+                </div>
+            </div>
+
+            <!-- CABEÇALHO FIXO DO APP (Identidade Visual & Operador Autenticado - RNF01) -->
+            <div class="bg-[#065F46] text-white px-4 py-3.5 shadow-md flex items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-800 border border-emerald-500 flex items-center justify-center text-xl shadow-inner" aria-hidden="true">
+                        🌱
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold leading-tight tracking-tight">Horta & Mesa</h2>
+                        <p class="text-xs text-emerald-100 font-medium">Associação Mãos Solidárias</p>
+                    </div>
+                </div>
+                <button type="button" onclick="showToast('Sessão encerrada com segurança (Flask-Login).')"
+                    aria-label="Encerrar sessão do operador"
+                    class="min-w-[48px] min-h-[48px] px-3 rounded-xl bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 border border-emerald-500 text-white text-xs font-bold flex flex-col items-center justify-center transition">
+                    <span class="text-sm leading-none mb-0.5">🚪</span>
+                    <span>Sair</span>
+                </button>
+            </div>
+
+            <!-- FAIXA DE IDENTIFICAÇÃO DO OPERADOR LOGADO -->
+            <div class="bg-emerald-50 border-b border-emerald-200 px-4 py-2 flex items-center justify-between text-xs shrink-0">
+                <span class="font-semibold text-emerald-950 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>
+                    Operador: <strong>Sra. Helena Martins</strong>
+                </span>
+                <span class="bg-emerald-200 text-emerald-950 font-bold px-2 py-0.5 rounded text-[11px]">
+                    Ativo
+                </span>
+            </div>
+
+            <!-- CONTEÚDO ROLÁVEL DAS 3 TELAS -->
+            <div class="flex-1 overflow-y-auto mobile-scroll p-4 space-y-4" id="app-viewport">
+
+                <!-- ===================================================================== -->
+                <!-- TELA 1: ENTRADA PRINCIPAL / MENU INICIAL (DASHBOARD)                  -->
+                <!-- ===================================================================== -->
+                <section id="screen-1" class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900">Painel do Mutirão de Hoje</h3>
+                        <p class="text-sm text-slate-700">Selecione uma operação abaixo para iniciar.</p>
+                    </div>
+
+                    <!-- Indicadores Resumidos do Dia -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-200 shadow-sm">
+                            <span class="text-xs font-bold uppercase tracking-wide text-slate-600 block mb-1">
+                                Famílias Atendidas
+                            </span>
+                            <div class="flex items-baseline gap-1">
+                                <span id="dash-families-count" class="text-2xl font-extrabold text-[#065F46]">18</span>
+                                <span class="text-sm font-bold text-slate-600">/ 30</span>
+                            </div>
+                            <span class="text-xs font-medium text-emerald-800 mt-1 block">
+                                ✔️ 12 cestas restantes
+                            </span>
+                        </div>
+
+                        <div class="bg-amber-50 p-3.5 rounded-2xl border-2 border-amber-400 shadow-sm">
+                            <span class="text-xs font-bold uppercase tracking-wide text-amber-950 block mb-1">
+                                Alerta Validade FIFO
+                            </span>
+                            <div class="flex items-baseline gap-1">
+                                <span id="dash-fifo-count" class="text-2xl font-extrabold text-amber-900">2</span>
+                                <span class="text-sm font-bold text-amber-900">lotes</span>
+                            </div>
+                            <span class="text-xs font-bold text-amber-950 mt-1 block">
+                                ⚠️ Priorizar saída hoje
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Ações Principais (Touch targets >= 56px de altura - RNF04) -->
+                    <div class="space-y-3 pt-1">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-600">
+                            Ações Principais
+                        </p>
+
+                        <!-- Botão Prioritário -->
+                        <button type="button" onclick="navigateTo('screen-2', 'checkin')"
+                            class="w-full min-h-[68px] p-4 rounded-2xl bg-[#065F46] hover:bg-[#044735] active:scale-[0.99] text-white shadow-md border-2 border-[#044735] flex items-center gap-3.5 text-left transition">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-800 flex items-center justify-center text-2xl shrink-0" aria-hidden="true">
+                                🔍
+                            </div>
+                            <div class="flex-1">
+                                <span class="block text-base font-extrabold leading-snug">
+                                    Check-in de Família
+                                </span>
+                                <span class="block text-xs text-emerald-100 font-medium mt-0.5">
+                                    Buscar CPF, validar ciclo de 7 dias e entregar cesta
+                                </span>
+                            </div>
+                            <span class="text-xl font-bold" aria-hidden="true">→</span>
+                        </button>
+
+                        <!-- Botão Secundário (Borda verde escura, alto contraste) -->
+                        <button type="button" onclick="navigateTo('screen-2', 'lote')"
+                            class="w-full min-h-[64px] p-4 rounded-2xl bg-white hover:bg-emerald-50 active:scale-[0.99] text-[#065F46] shadow-sm border-2 border-[#065F46] flex items-center gap-3.5 text-left transition">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-2xl shrink-0" aria-hidden="true">
+                                ➕
+                            </div>
+                            <div class="flex-1">
+                                <span class="block text-base font-extrabold leading-snug text-slate-900">
+                                    Novo Lote de Doação
+                                </span>
+                                <span class="block text-xs text-slate-700 font-medium mt-0.5">
+                                    Registrar entrada de alimentos e validade FIFO
+                                </span>
+                            </div>
+                            <span class="text-xl font-bold text-[#065F46]" aria-hidden="true">→</span>
+                        </button>
+                    </div>
+
+                    <!-- Resumo Rápido de Prioridade FIFO na Tela Inicial -->
+                    <div class="bg-white rounded-2xl p-3.5 border-2 border-slate-200 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-extrabold text-slate-900">Saída Prioritária (FIFO)</h4>
+                            <button type="button" onclick="navigateTo('screen-2', 'checkin')"
+                                class="min-h-[48px] px-2 text-xs font-bold text-[#065F46] underline">
+                                Ver estoque completo
+                            </button>
+                        </div>
+                        <div class="p-3 rounded-xl bg-red-50 border-2 border-red-300 flex items-start gap-2.5">
+                            <span class="text-lg leading-none mt-0.5" aria-hidden="true">⚠️</span>
+                            <div>
+                                <p class="text-sm font-extrabold text-red-950">Tomate Longa Vida (15 kg)</p>
+                                <p class="text-xs font-bold text-red-900 mt-0.5">
+                                    ALERTA CRÍTICO: Vence em 2 dias (Distribuir primeiro)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===================================================================== -->
+                <!-- TELA 2: EXECUÇÃO CENTRAL (CHECK-IN POR CPF & ESTOQUE FIFO)            -->
+                <!-- ===================================================================== -->
+                <section id="screen-2" class="hidden space-y-4">
+                    <!-- Botão Voltar ao Menu (48x48px mínimo) -->
+                    <div class="flex items-center justify-between gap-2">
+                        <button type="button" onclick="navigateTo('screen-1')"
+                            class="min-h-[48px] px-3.5 rounded-xl bg-white hover:bg-slate-100 border-2 border-slate-300 text-slate-900 text-sm font-bold flex items-center gap-2 shadow-sm transition">
+                            <span aria-hidden="true">←</span>
+                            <span>Voltar ao Menu</span>
+                        </button>
+                        <span class="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-lg">
+                            Etapa 2 de 3
+                        </span>
+                    </div>
+
+                    <!-- Alternador de Modo na Tela 2 (Check-in vs Cadastro de Lote) -->
+                    <div class="grid grid-cols-2 gap-2 bg-slate-200 p-1.5 rounded-2xl" role="tablist">
+                        <button type="button" id="tab-checkin" onclick="switchScreen2Tab('checkin')" role="tab" aria-selected="true"
+                            class="min-h-[48px] rounded-xl text-xs sm:text-sm font-extrabold bg-[#065F46] text-white shadow transition">
+                            🔍 Check-in Família
+                        </button>
+                        <button type="button" id="tab-lote" onclick="switchScreen2Tab('lote')" role="tab" aria-selected="false"
+                            class="min-h-[48px] rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:bg-slate-300 transition">
+                            ➕ Cadastrar Lote
+                        </button>
+                    </div>
+
+                    <!-- SUB-PAINEL A: BUSCA DE FAMÍLIA POR CPF (RF02) -->
+                    <div id="panel-checkin" class="space-y-4">
+                        <div class="bg-white p-4 rounded-2xl border-2 border-slate-300 shadow-sm space-y-3">
+                            <div>
+                                <h3 class="text-base font-extrabold text-slate-900">1. Buscar Família Beneficiária</h3>
+                                <p class="text-xs text-slate-700 mt-0.5">
+                                    Informe o CPF para verificar elegibilidade semanal (RF02).
+                                </p>
+                            </div>
+
+                            <!-- Campo Input com Rótulo Persistente e Altura 52px -->
+                            <div>
+                                <label for="cpf-input" class="block text-sm font-bold text-slate-900 mb-1.5">
+                                    CPF do Responsável Familiar (somente números ou formatado)
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="cpf-input" inputmode="numeric" maxlength="14"
+                                        placeholder="000.000.000-00"
+                                        oninput="handleCpfMask(this)"
+                                        class="w-full h-[52px] px-3.5 rounded-xl border-2 border-slate-400 bg-white text-slate-900 text-base font-bold tracking-wide focus:border-[#065F46]">
+                                    <button type="button" onclick="searchFamilyByCpf()"
+                                        aria-label="Pesquisar CPF"
+                                        class="min-w-[56px] h-[52px] rounded-xl bg-[#065F46] hover:bg-[#044735] text-white font-bold text-lg flex items-center justify-center shrink-0">
+                                        🔍
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Chips Rápidos de Demonstração Fictícia -->
+                            <div class="space-y-2 pt-1">
+                                <span class="block text-xs font-bold text-slate-700">
+                                    Testes rápidos (dados fictícios):
+                                </span>
+                                <button type="button" onclick="fillDemoCpf('123.456.789-00')"
+                                    class="w-full min-h-[48px] px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-600 text-emerald-950 text-xs font-bold text-left flex items-center justify-between transition">
+                                    <span>✔️ Testar CPF Liberado: <strong>123.456.789-00</strong> (Família Silva)</span>
+                                    <span class="underline shrink-0 ml-1">Usar</span>
+                                </button>
+                                <button type="button" onclick="fillDemoCpf('987.654.321-99')"
+                                    class="w-full min-h-[48px] px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 border-2 border-red-500 text-red-950 text-xs font-bold text-left flex items-center justify-between transition">
+                                    <span>⛔ Testar CPF Bloqueado: <strong>987.654.321-99</strong> (Família Oliveira)</span>
+                                    <span class="underline shrink-0 ml-1">Usar</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card da Família Encontrada (Exibido dinamicamente) -->
+                        <div id="family-result-card" class="bg-white p-4 rounded-2xl border-2 border-[#065F46] shadow-md space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-950 mb-1">
+                                        Cadastro Localizado
+                                    </span>
+                                    <h4 id="fam-name" class="text-base font-extrabold text-slate-900">
+                                        Maria Aparecida da Silva (Família Silva)
+                                    </h4>
+                                    <p id="fam-cpf-display" class="text-xs font-bold text-slate-700">
+                                        CPF: 123.456.789-00 • 4 integrantes na residência
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div id="fam-status-box" class="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-bold text-emerald-950">
+                                ✔️ Última retirada: há 14 dias (Apta para receber cesta hoje)
+                            </div>
+
+                            <!-- Botão Grande de Confirmação (56px altura) -->
+                            <button type="button" onclick="confirmDeliveryAction()"
+                                class="w-full min-h-[56px] px-4 py-3 rounded-xl bg-[#065F46] hover:bg-[#044735] active:scale-[0.99] text-white text-base font-extrabold shadow-md flex items-center justify-center gap-2 transition">
+                                <span>✅</span>
+                                <span>Confirmar Entrega da Cesta</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SUB-PAINEL B: FORMULÁRIO DE CADASTRO DE NOVO LOTE FIFO (RF01 + RNF02 XSS) -->
+                    <div id="panel-lote" class="hidden bg-white p-4 rounded-2xl border-2 border-slate-300 shadow-sm space-y-3.5">
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-900">Cadastrar Novo Lote de Doação</h3>
+                            <p class="text-xs text-slate-700 mt-0.5">
+                                O sistema calculará automaticamente a prioridade FIFO pela validade.
+                            </p>
+                        </div>
+
+                        <form id="form-new-lote" onsubmit="handleSaveLote(event)" class="space-y-3">
+                            <div>
+                                <label for="lote-desc" class="block text-sm font-bold text-slate-900 mb-1">
+                                    Descrição do Alimento (ex: Cenoura, Banana)
+                                </label>
+                                <input type="text" id="lote-desc" required maxlength="60"
+                                    placeholder="Digite o nome do item doado"
+                                    class="w-full h-[50px] px-3.5 rounded-xl border-2 border-slate-400 bg-white text-slate-900 text-sm font-semibold">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label for="lote-qtd" class="block text-sm font-bold text-slate-900 mb-1">
+                                        Quantidade / Unid.
+                                    </label>
+                                    <input type="text" id="lote-qtd" required maxlength="20"
+                                        placeholder="Ex: 12 kg"
+                                        class="w-full h-[50px] px-3.5 rounded-xl border-2 border-slate-400 bg-white text-slate-900 text-sm font-semibold">
+                                </div>
+                                <div>
+                                    <label for="lote-validade" class="block text-sm font-bold text-slate-900 mb-1">
+                                        Data de Validade
+                                    </label>
+                                    <input type="date" id="lote-validade" required
+                                        class="w-full h-[50px] px-3 rounded-xl border-2 border-slate-400 bg-white text-slate-900 text-sm font-semibold">
+                                </div>
+                            </div>
+
+                            <div id="lote-error-msg" class="hidden p-3 rounded-xl bg-red-50 border-2 border-red-500 text-red-950 text-xs font-bold">
+                            </div>
+
+                            <button type="submit"
+                                class="w-full min-h-[54px] px-4 rounded-xl bg-[#065F46] hover:bg-[#044735] text-white text-base font-extrabold shadow transition">
+                                💾 Salvar Lote no Estoque FIFO
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- SEÇÃO 2: ESTOQUE ATIVO - PRIORIDADE FIFO (RNF04 Redundância Informativa) -->
+                    <div class="space-y-2.5 pt-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-extrabold uppercase tracking-wide text-slate-900">
+                                2. Estoque Ativo (Ordem FIFO)
+                            </h3>
+                            <span class="text-[11px] font-bold text-slate-700">Cor + Ícone + Texto</span>
+                        </div>
+
+                        <div id="fifo-stock-list" class="space-y-2.5">
+                            <!-- Card 1: Alerta Crítico -->
+                            <article class="bg-white p-3.5 rounded-2xl border-2 border-red-500 shadow-sm space-y-2">
+                                <div class="flex justify-between items-start gap-2">
+                                    <h4 class="text-base font-extrabold text-slate-900">Tomate Longa Vida</h4>
+                                    <span class="text-sm font-extrabold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-300">
+                                        15 kg
+                                    </span>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-red-100 border border-red-400 text-red-950 text-xs font-extrabold flex items-center gap-2">
+                                    <span class="text-base" aria-hidden="true">⚠️</span>
+                                    <span>ALERTA CRÍTICO: Vence em 2 dias (Prioridade 1)</span>
+                                </div>
+                            </article>
+
+                            <!-- Card 2: Atenção -->
+                            <article class="bg-white p-3.5 rounded-2xl border-2 border-amber-500 shadow-sm space-y-2">
+                                <div class="flex justify-between items-start gap-2">
+                                    <h4 class="text-base font-extrabold text-slate-900">Alface Crespa Orgânica</h4>
+                                    <span class="text-sm font-extrabold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-300">
+                                        20 maços
+                                    </span>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-amber-100 border border-amber-400 text-amber-950 text-xs font-extrabold flex items-center gap-2">
+                                    <span class="text-base" aria-hidden="true">⏳</span>
+                                    <span>ATENÇÃO: Vence em 3 dias (Prioridade 2)</span>
+                                </div>
+                            </article>
+
+                            <!-- Card 3: Normal -->
+                            <article class="bg-white p-3.5 rounded-2xl border-2 border-emerald-600 shadow-sm space-y-2">
+                                <div class="flex justify-between items-start gap-2">
+                                    <h4 class="text-base font-extrabold text-slate-900">Batata Inglesa Lavada</h4>
+                                    <span class="text-sm font-extrabold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-300">
+                                        40 kg
+                                    </span>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-emerald-100 border border-emerald-400 text-emerald-950 text-xs font-extrabold flex items-center gap-2">
+                                    <span class="text-base" aria-hidden="true">✔️</span>
+                                    <span>NORMAL: Vence em 12 dias</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===================================================================== -->
+                <!-- TELA 3: ALERTAS E RESULTADOS (CONFIRMAÇÃO OU BLOQUEIO SEMANAL - RF03) -->
+                <!-- ===================================================================== -->
+                <section id="screen-3" class="hidden space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            Resultado da Operação (RF03)
+                        </span>
+                        <span class="text-xs font-bold text-slate-600 bg-slate-200 px-2.5 py-1 rounded-lg">
+                            Etapa 3 de 3
+                        </span>
+                    </div>
+
+                    <!-- CENÁRIO 3A: SUCESSO - ENTREGA LIBERADA -->
+                    <div id="result-success-card" class="bg-emerald-50 border-2 border-[#065F46] rounded-2xl p-5 shadow-md space-y-4">
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="w-16 h-16 rounded-full bg-[#065F46] text-white flex items-center justify-center text-3xl shadow" aria-hidden="true">
+                                ✔️
+                            </div>
+                            <h3 class="text-xl font-extrabold text-emerald-950 leading-tight">
+                                Entrega Registrada com Sucesso!
+                            </h3>
+                            <p class="text-xs font-bold text-emerald-900 bg-emerald-200/80 px-3 py-1 rounded-full">
+                                Status: Check-in Confirmado e Estoque Atualizado
+                            </p>
+                        </div>
+
+                        <!-- Detalhes Claros do Comprovante Digital -->
+                        <div class="bg-white rounded-xl p-3.5 border border-emerald-300 space-y-2 text-xs text-slate-900">
+                            <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                                <span class="font-semibold text-slate-600">Beneficiário:</span>
+                                <span id="res-fam-name" class="font-extrabold">Maria Aparecida da Silva</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                                <span class="font-semibold text-slate-600">CPF Validado:</span>
+                                <span id="res-fam-cpf" class="font-extrabold">123.456.789-00</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-200 pb-1.5">
+                                <span class="font-semibold text-slate-600">Data/Hora (Timestamp):</span>
+                                <span id="res-timestamp" class="font-extrabold">17/11/2026 às 14:32</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold text-slate-600">Baixa Automática FIFO:</span>
+                                <span class="font-extrabold text-[#065F46]">Lote #01 (Tomate Longa Vida)</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-emerald-900 text-white text-xs font-bold flex items-center gap-2.5">
+                            <span class="text-base" aria-hidden="true">🔒</span>
+                            <span>Bloqueio preventivo de 7 dias ativado automaticamente para este CPF.</span>
+                        </div>
+
+                        <!-- Botões de Ação >= 56px -->
+                        <div class="space-y-2.5 pt-1">
+                            <button type="button" onclick="navigateTo('screen-2', 'checkin')"
+                                class="w-full min-h-[56px] px-4 rounded-xl bg-[#065F46] hover:bg-[#044735] text-white text-base font-extrabold shadow flex items-center justify-center gap-2 transition">
+                                <span>🔍</span>
+                                <span>Atender Próxima Família</span>
+                            </button>
+                            <button type="button" onclick="navigateTo('screen-1')"
+                                class="w-full min-h-[56px] px-4 rounded-xl bg-white hover:bg-emerald-100 border-2 border-[#065F46] text-[#065F46] text-base font-extrabold flex items-center justify-center gap-2 transition">
+                                <span>🏠</span>
+                                <span>Voltar ao Menu Inicial</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- CENÁRIO 3B: BLOQUEIO DE DUPLICIDADE - REGRA DOS 7 DIAS -->
+                    <div id="result-blocked-card" class="hidden bg-red-50 border-2 border-red-600 rounded-2xl p-5 shadow-md space-y-4">
+                        <div class="flex flex-col items-center text-center space-y-2">
+                            <div class="w-16 h-16 rounded-full bg-red-700 text-white flex items-center justify-center text-3xl shadow" aria-hidden="true">
+                                ⛔
+                            </div>
+                            <h3 class="text-xl font-extrabold text-red-950 leading-tight">
+                                Entrega Bloqueada: Retirada Duplicada
+                            </h3>
+                            <span class="text-xs font-extrabold text-red-950 bg-red-200 px-3 py-1 rounded-full">
+                                Regra de Intervalo Mínimo (7 Dias)
+                            </span>
+                        </div>
+
+                        <!-- Mensagem Compreensível sem Exposição de Códigos Técnicos (RNF02) -->
+                        <div class="bg-white rounded-xl p-4 border-2 border-red-300 space-y-2">
+                            <p class="text-sm font-extrabold text-slate-900">
+                                Família: <span id="blk-fam-name">Carlos Eduardo Oliveira (Família Oliveira)</span>
+                            </p>
+                            <p class="text-xs font-bold text-slate-700">
+                                CPF: <span id="blk-fam-cpf">987.654.321-99</span>
+                            </p>
+                            <p class="text-sm text-red-950 font-semibold leading-relaxed pt-1 border-t border-red-100">
+                                Esta família já retirou uma cesta nos últimos 7 dias (Último registro: <strong>há 2 dias</strong>). Nova retirada liberada somente após completar o ciclo semanal.
+                            </p>
+                        </div>
+
+                        <!-- Botões de Ação >= 56px -->
+                        <div class="space-y-2.5 pt-1">
+                            <button type="button" onclick="navigateTo('screen-2', 'checkin')"
+                                class="w-full min-h-[56px] px-4 rounded-xl bg-red-700 hover:bg-red-800 text-white text-base font-extrabold shadow flex items-center justify-center gap-2 transition">
+                                <span>🔍</span>
+                                <span>Consultar Outro CPF</span>
+                            </button>
+                            <button type="button" onclick="navigateTo('screen-1')"
+                                class="w-full min-h-[56px] px-4 rounded-xl bg-white hover:bg-red-100 border-2 border-red-700 text-red-900 text-base font-extrabold flex items-center justify-center gap-2 transition">
+                                <span>🏠</span>
+                                <span>Voltar ao Menu Inicial</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RODAPÉ DE ACESSIBILIDADE & SEGURANÇA DENTRO DO APP -->
+            <footer class="bg-slate-100 border-t border-slate-300 px-4 py-2 text-[11px] text-slate-700 flex items-center justify-between shrink-0">
+                <span class="font-semibold">🔒 Conexão Segura (TLS)</span>
+                <span class="font-semibold">♿ Alto Contraste & Toque ≥48px</span>
+            </footer>
+
+            <!-- NOTIFICAÇÃO FLUTUANTE INTERNA (Substitui alert() proibidos) -->
+            <div id="app-toast" role="status" aria-live="polite"
+                class="hidden absolute bottom-12 left-4 right-4 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl border border-slate-700 z-50 text-center">
+            </div>
+        </div>
+
+        <!-- Barra de navegação gestual inferior simulada do Android -->
+        <div class="w-32 h-1.5 bg-slate-600 rounded-full mx-auto mt-2.5" aria-hidden="true"></div>
+    </main>
+
+    <script>
+        // Base de dados fictícia em memória para demonstração interativa
+        const mockFamilies = {
+            '123.456.789-00': {
+                name: 'Maria Aparecida da Silva (Família Silva)',
+                cpf: '123.456.789-00',
+                members: 4,
+                blocked: false,
+                lastPickupText: 'há 14 dias (Apta para receber cesta hoje)'
+            },
+            '987.654.321-99': {
+                name: 'Carlos Eduardo Oliveira (Família Oliveira)',
+                cpf: '987.654.321-99',
+                members: 5,
+                blocked: true,
+                lastPickupText: 'há 2 dias (Bloqueio semanal ativo)'
+            }
+        };
+
+        let currentSelectedFamily = mockFamilies['123.456.789-00'];
+        let deliveredCount = 18;
+
+        // Inicializa o estado padrão
+        window.onload = function() {
+            document.getElementById('cpf-input').value = '123.456.789-00';
+            // Define data mínima como hoje no campo de validade
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('lote-validade');
+            if (dateInput) {
+                dateInput.min = todayStr;
+                dateInput.value = todayStr;
+            }
+        };
+
+        // Navegação entre as 3 telas principais
+        function navigateTo(screenId, subMode = null) {
+            ['screen-1', 'screen-2', 'screen-3'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+
+            if (screenId === 'screen-2' && subMode) {
+                switchScreen2Tab(subMode);
+            }
+
+            // Rola o viewport do celular para o topo
+            document.getElementById('app-viewport').scrollTop = 0;
+        }
+
+        // Alterna abas internas da Tela 2 (Check-in vs Novo Lote)
+        function switchScreen2Tab(tab) {
+            const tabCheckin = document.getElementById('tab-checkin');
+            const tabLote = document.getElementById('tab-lote');
+            const panelCheckin = document.getElementById('panel-checkin');
+            const panelLote = document.getElementById('panel-lote');
+
+            if (tab === 'checkin') {
+                panelCheckin.classList.remove('hidden');
+                panelLote.classList.add('hidden');
+                tabCheckin.className = "min-h-[48px] rounded-xl text-xs sm:text-sm font-extrabold bg-[#065F46] text-white shadow transition";
+                tabCheckin.setAttribute('aria-selected', 'true');
+                tabLote.className = "min-h-[48px] rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:bg-slate-300 transition";
+                tabLote.setAttribute('aria-selected', 'false');
+            } else {
+                panelCheckin.classList.add('hidden');
+                panelLote.classList.remove('hidden');
+                tabLote.className = "min-h-[48px] rounded-xl text-xs sm:text-sm font-extrabold bg-[#065F46] text-white shadow transition";
+                tabLote.setAttribute('aria-selected', 'true');
+                tabCheckin.className = "min-h-[48px] rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:bg-slate-300 transition";
+                tabCheckin.setAttribute('aria-selected', 'false');
+            }
+        }
+
+        // Máscara automática de CPF
+        function handleCpfMask(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.slice(0, 11);
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            input.value = v;
+        }
+
+        // Preenche rapidamente os CPFs fictícios de demonstração
+        function fillDemoCpf(cpf) {
+            document.getElementById('cpf-input').value = cpf;
+            searchFamilyByCpf();
+        }
+
+        // Busca família na base fictícia
+        function searchFamilyByCpf() {
+            const rawCpf = document.getElementById('cpf-input').value.trim();
+            const card = document.getElementById('family-result-card');
+            const famName = document.getElementById('fam-name');
+            const famCpfDisplay = document.getElementById('fam-cpf-display');
+            const famStatusBox = document.getElementById('fam-status-box');
+
+            if (mockFamilies[rawCpf]) {
+                currentSelectedFamily = mockFamilies[rawCpf];
+            } else if (rawCpf.length >= 11) {
+                // Qualquer outro CPF digitado pelo operador simula uma família apta
+                currentSelectedFamily = {
+                    name: 'Ana Paula Santos (Família Santos)',
+                    cpf: rawCpf,
+                    members: 3,
+                    blocked: false,
+                    lastPickupText: 'Nenhum registro recente (Apta hoje)'
+                };
+            } else {
+                showToast('Digite um CPF válido com 11 dígitos ou use os botões de teste.');
+                return;
+            }
+
+            famName.textContent = currentSelectedFamily.name;
+            famCpfDisplay.textContent = `CPF: ${currentSelectedFamily.cpf} • ${currentSelectedFamily.members} integrantes na residência`;
+
+            if (currentSelectedFamily.blocked) {
+                card.className = "bg-white p-4 rounded-2xl border-2 border-red-500 shadow-md space-y-3";
+                famStatusBox.className = "p-3 rounded-xl bg-red-50 border border-red-300 text-xs font-extrabold text-red-950";
+                famStatusBox.textContent = `⛔ Última retirada: ${currentSelectedFamily.lastPickupText}`;
+            } else {
+                card.className = "bg-white p-4 rounded-2xl border-2 border-[#065F46] shadow-md space-y-3";
+                famStatusBox.className = "p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-xs font-extrabold text-emerald-950";
+                famStatusBox.textContent = `✔️ Última retirada: ${currentSelectedFamily.lastPickupText}`;
+            }
+
+            showToast('Cadastro familiar localizado.');
+        }
+
+        // Confirmação da entrega na Tela 2 -> direciona para Tela 3A ou 3B
+        function confirmDeliveryAction() {
+            if (currentSelectedFamily.blocked) {
+                document.getElementById('blk-fam-name').textContent = currentSelectedFamily.name;
+                document.getElementById('blk-fam-cpf').textContent = currentSelectedFamily.cpf;
+                showResultScenario('blocked');
+            } else {
+                document.getElementById('res-fam-name').textContent = currentSelectedFamily.name;
+                document.getElementById('res-fam-cpf').textContent = currentSelectedFamily.cpf;
+
+                // Atualiza timestamp atual formatado
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR');
+                const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('res-timestamp').textContent = `${dateStr} às ${timeStr}`;
+
+                // Atualiza contador do dashboard
+                if (deliveredCount < 30) {
+                    deliveredCount++;
+                    document.getElementById('dash-families-count').textContent = deliveredCount;
+                }
+
+                showResultScenario('success');
+            }
+        }
+
+        // Exibe Tela 3A (Sucesso) ou 3B (Bloqueio)
+        function showResultScenario(type) {
+            navigateTo('screen-3');
+            const successCard = document.getElementById('result-success-card');
+            const blockedCard = document.getElementById('result-blocked-card');
+
+            if (type === 'success') {
+                successCard.classList.remove('hidden');
+                blockedCard.classList.add('hidden');
+            } else {
+                successCard.classList.add('hidden');
+                blockedCard.classList.remove('hidden');
+            }
+        }
+
+        // Cadastro de Novo Lote com Sanitização XSS (RNF02) e Validação de Data (RF01)
+        function handleSaveLote(event) {
+            event.preventDefault();
+            const descInput = document.getElementById('lote-desc');
+            const qtdInput = document.getElementById('lote-qtd');
+            const valInput = document.getElementById('lote-validade');
+            const errorBox = document.getElementById('lote-error-msg');
+
+            const rawDesc = descInput.value.trim();
+            const rawQtd = qtdInput.value.trim();
+            const valDate = new Date(valInput.value + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Validação de data >= hoje (RF01)
+            if (valDate < today) {
+                errorBox.textContent = '⚠️ Erro de Validação: A data de validade deve ser igual ou posterior à data de hoje.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+            errorBox.classList.add('hidden');
+
+            // Calcula dias restantes para classificação FIFO
+            const diffDays = Math.ceil((valDate - today) / (1000 * 60 * 60 * 24));
+            let borderClass = 'border-emerald-600';
+            let badgeClass = 'bg-emerald-100 border-emerald-400 text-emerald-950';
+            let icon = '✔️';
+            let statusText = `NORMAL: Vence em ${diffDays} dias`;
+
+            if (diffDays <= 2) {
+                borderClass = 'border-red-500';
+                badgeClass = 'bg-red-100 border-red-400 text-red-950';
+                icon = '⚠️';
+                statusText = `ALERTA CRÍTICO: Vence em ${diffDays === 0 ? 'hoje' : diffDays + ' dias'} (Prioridade 1)`;
+            } else if (diffDays <= 4) {
+                borderClass = 'border-amber-500';
+                badgeClass = 'bg-amber-100 border-amber-400 text-amber-950';
+                icon = '⏳';
+                statusText = `ATENÇÃO: Vence em ${diffDays} dias (Prioridade 2)`;
+            }
+
+            // Criação segura via DOM (textContent previne execução XSS - RNF02)
+            const article = document.createElement('article');
+            article.className = `bg-white p-3.5 rounded-2xl border-2 ${borderClass} shadow-sm space-y-2`;
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'flex justify-between items-start gap-2';
+
+            const titleEl = document.createElement('h4');
+            titleEl.className = 'text-base font-extrabold text-slate-900';
+            titleEl.textContent = rawDesc; // Escape automático contra XSS
+
+            const qtdEl = document.createElement('span');
+            qtdEl.className = 'text-sm font-extrabold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-300';
+            qtdEl.textContent = rawQtd;
+
+            headerDiv.appendChild(titleEl);
+            headerDiv.appendChild(qtdEl);
+
+            const badgeDiv = document.createElement('div');
+            badgeDiv.className = `p-2.5 rounded-xl border text-xs font-extrabold flex items-center gap-2 ${badgeClass}`;
+
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'text-base';
+            iconSpan.setAttribute('aria-hidden', 'true');
+            iconSpan.textContent = icon;
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = statusText;
+
+            badgeDiv.appendChild(iconSpan);
+            badgeDiv.appendChild(textSpan);
+
+            article.appendChild(headerDiv);
+            article.appendChild(badgeDiv);
+
+            const stockList = document.getElementById('fifo-stock-list');
+            stockList.prepend(article);
+
+            descInput.value = '';
+            qtdInput.value = '';
+            switchScreen2Tab('checkin');
+            showToast('Lote cadastrado com sucesso no estoque FIFO!');
+        }
+
+        // Toast acessível interno
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('app-toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
